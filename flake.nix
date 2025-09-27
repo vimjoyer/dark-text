@@ -14,11 +14,21 @@
             quickshell
           ];
           text = ''
-            # Usage: dark-shell -t "Hello" -c "#ff0000" -d 1500
-
             DARK_TEXT="Hello, World!"
             DARK_COLOR="#fad049"
             DARK_DURATION="1000"
+
+            show_help() { 
+            cat <<EOF
+            Usage: dark-text [OPTIONS]
+            
+            Options:
+              -t, --text <TEXT>       Text to display [default: Hello, World!]
+              -c, --color <COLOR>     Text color [default: #fad049]
+              -d, --duration <MS>     Duration in milliseconds [default: 1000]
+              -h, --help              Print help
+            EOF
+            }
 
             while [[ $# -gt 0 ]]; do
               case "$1" in
@@ -34,9 +44,14 @@
                   DARK_DURATION="$2"
                   shift 2
                   ;;
+                -h|--help)
+                  show_help 
+                  exit 1
+                  ;;
                 *)
                   echo "Unknown option: $1"
-                  exit 1
+                  show_help 
+                  exit 0
                   ;;
               esac
             done
