@@ -4,6 +4,9 @@ import Quickshell.Io
 import QtQuick.Effects
 
 ShellRoot {
+    id: root
+    property int animationDuration: 1000
+
     Variants {
         model: Quickshell.screens
         delegate: PanelWindow {
@@ -69,7 +72,7 @@ ShellRoot {
                             property: "opacity"
                             from: 0
                             to: 1
-                            duration: 500
+                            duration: root.animationDuration / 4
                         }
 
                         NumberAnimation {
@@ -77,7 +80,7 @@ ShellRoot {
                             property: "opacity"
                             from: 1
                             to: 1
-                            duration: 1000
+                            duration: root.animationDuration / 2
                         }
 
                         NumberAnimation {
@@ -85,7 +88,7 @@ ShellRoot {
                             property: "opacity"
                             from: 1
                             to: 0
-                            duration: 500
+                            duration: root.animationDuration / 4
                         }
                     }
 
@@ -94,7 +97,7 @@ ShellRoot {
                         property: "font.letterSpacing"
                         from: 1
                         to: 10
-                        duration: 2000
+                        duration: root.animationDuration
                     }
 
                     onStopped: {
@@ -104,7 +107,7 @@ ShellRoot {
 
                 Process {
                     running: true
-                    command: ["sh", "-c", "echo $TEXT"]
+                    command: ["sh", "-c", "echo $DARK_TEXT"]
                     stdout: StdioCollector {
                         onStreamFinished: {
                             if (this.text && this.text.trim() !== "") {
@@ -113,6 +116,32 @@ ShellRoot {
                         }
                     }
                 }
+
+                Process {
+                    running: true
+                    command: ["sh", "-c", "echo $DARK_DURATION"]
+                    stdout: StdioCollector {
+                      onStreamFinished: {
+                        if (this.text && this.text.trim() !== "" ){
+                            root.animationDuration = parseInt(this.text);
+                        }
+                      }
+                    }
+                }
+
+                Process {
+                    running: true
+                    command: ["sh", "-c", "echo $DARK_COLOR"]
+                    stdout: StdioCollector {
+                      onStreamFinished: {
+                        if (this.text && this.text.trim() !== ""){
+                            console.log(this.text)
+                            mainText.color = this.text.trim();
+                        }
+                      }
+                    }
+                }
+
             }
         }
     }
