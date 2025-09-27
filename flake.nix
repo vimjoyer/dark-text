@@ -29,6 +29,7 @@
             : "''${DARK_DURATION:=10000}"
             : "''${SOUND:=victory}"
             : "''${PLAY_SOUND:=true}"
+            : "''${SHOW_OVERLAY:=true}"
 
             play_sound() {
                 play "${./sounds}/$1.mp3" >/dev/null 2>&1 &
@@ -49,6 +50,7 @@
               -s, --sound             Sound to play [default: victory]
                                       Available sounds: ${pkgs.lib.concatStringsSep " " SOUNDS}
               -n, --no-sound          Don't play sound
+              --no-display            Don't display overlay
               --death                 Dark souls death preset
               -h, --help              Print help
             EOF
@@ -76,6 +78,10 @@
                   PLAY_SOUND=false
                   shift
                   ;;
+                --no-display)
+                  SHOW_OVERLAY=false
+                  shift
+                  ;;
                 --death)
                   SOUND="death"
                   DARK_DURATION=6500
@@ -96,11 +102,13 @@
 
             export DARK_TEXT DARK_COLOR DARK_DURATION
 
-            if [ "$PLAY_SOUND" = true ]; then
+            if $PLAY_SOUND; then
                 play_sound "$SOUND"
             fi
 
-            exec quickshell -p ${./shell.qml} > /dev/null
+            if $SHOW_OVERLAY; then
+              exec quickshell -p ${./shell.qml} > /dev/null
+            fi
           '';
         };
 
