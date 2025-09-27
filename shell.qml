@@ -1,5 +1,6 @@
 import QtQuick 2.15
 import Quickshell
+import Quickshell.Io
 import QtQuick.Effects
 
 ShellRoot {
@@ -11,7 +12,6 @@ ShellRoot {
             anchors.left: true
             anchors.right: true
             color: "#00000000"
-            // color: "black"
 
             Rectangle {
                 id: myRectangle
@@ -99,6 +99,18 @@ ShellRoot {
 
                     onStopped: {
                         Qt.quit();
+                    }
+                }
+
+                Process {
+                    running: true
+                    command: ["sh", "-c", "echo $TEXT"]
+                    stdout: StdioCollector {
+                        onStreamFinished: {
+                            if (this.text && this.text.trim() !== "") {
+                                mainText.text = this.text;
+                            }
+                        }
                     }
                 }
             }
