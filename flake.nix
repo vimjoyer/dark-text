@@ -13,15 +13,19 @@
           runtimeInputs = with pkgs; [
             quickshell
           ];
+          bashOptions = [
+            "errexit"
+            "pipefail"
+          ];
           text = ''
-            DARK_TEXT="Hello, World!"
-            DARK_COLOR="#fad049"
-            DARK_DURATION="1000"
+            : "''${DARK_TEXT:=Victory!}"
+            : "''${DARK_COLOR:=#fad049}"
+            : "''${DARK_DURATION:=1000}"
 
-            show_help() { 
+            show_help() {
             cat <<EOF
             Usage: dark-text [OPTIONS]
-            
+
             Options:
               -t, --text <TEXT>       Text to display [default: Hello, World!]
               -c, --color <COLOR>     Text color [default: #fad049]
@@ -45,13 +49,8 @@
                   shift 2
                   ;;
                 -h|--help)
-                  show_help 
+                  show_help
                   exit 1
-                  ;;
-                *)
-                  echo "Unknown option: $1"
-                  show_help 
-                  exit 0
                   ;;
               esac
             done
@@ -75,17 +74,17 @@
           ];
 
           text = ''
-            # Usage dark-souls [ -d | --death ] [ -n | --no-sound ] TEXT
-            ACTION="victory"
-            DURATION=10000
-            COLOR="#fad049"
-            PLAY_SOUND=true
+            : "''${DARK_TEXT:=Victory!}"
+            : "''${DARK_COLOR:=#fad049}"
+            : "''${DARK_DURATION:=10000}"
+            : "''${ACTION:=victory}"
+            : "''${PLAY_SOUND:=true}"
 
             case "''${1:-}" in
                 -d|--death)
                     ACTION="death"
-                    DURATION=6500
-                    COLOR="#A01212"
+                    DARK_DURATION=6500
+                    DARK_COLOR="#A01212"
                     shift
                     ;;
             esac
@@ -97,14 +96,14 @@
                     ;;
             esac
 
-            DARK_TEXT="$*"
+            export DARK_TEXT DARK_COLOR DARK_DURATION
 
             if [ "$PLAY_SOUND" = true ]; then
                 play "${./.}/$ACTION.mp3" >/dev/null 2>&1 &
                 sleep 0.2
             fi
 
-            ${lib.getExe dark-text} -t "$DARK_TEXT" -d $DURATION -c $COLOR
+            ${lib.getExe dark-text} "$@"
           '';
         };
 
