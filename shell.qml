@@ -1,12 +1,8 @@
 import QtQuick 2.15
-import QtQuick.Layouts 1.15
 import Quickshell
 import QtQuick.Effects
-import Quickshell.Services.Mpris
 
 ShellRoot {
-    readonly property int panelWidth: 50
-
     Variants {
         model: Quickshell.screens
         delegate: PanelWindow {
