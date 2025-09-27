@@ -41,6 +41,7 @@ ShellRoot {
                     color: "#fad049"
                     font.family: "EB Garamond"
 
+                    anchors.verticalCenterOffset: 30
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.verticalCenter: parent.verticalCenter
                 }
