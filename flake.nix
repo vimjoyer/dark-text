@@ -5,6 +5,9 @@
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
       FONTCONFIG_FILE = pkgs.makeFontsConf { fontDirectories = [ pkgs.eb-garamond ]; };
+      SOUNDS = map (f: pkgs.lib.strings.removeSuffix ".mp3" f) (
+        builtins.attrNames (builtins.readDir ./sounds)
+      );
     in
     {
       packages.${system} = rec {
@@ -24,7 +27,7 @@
             : "''${DARK_TEXT:=Hello, World!}"
             : "''${DARK_COLOR:=#fad049}"
             : "''${DARK_DURATION:=10000}"
-            : "''${ACTION:=victory}"
+            : "''${SOUND:=victory}"
             : "''${PLAY_SOUND:=true}"
 
             play_sound() {
@@ -34,7 +37,7 @@
             # todo: add more sounds and docs for them
             show_help() {
             if $PLAY_SOUND; then 
-              play_sound "help_me"
+              play_sound "help"
             fi
             cat <<EOF
             Usage: dark-text [OPTIONS]
@@ -43,7 +46,8 @@
               -t, --text <TEXT>       Text to display [default: Hello, World!]
               -c, --color <COLOR>     Text color [default: #fad049]
               -d, --duration <MS>     Duration in milliseconds [default: 10000]
-              -a, --action            Sound to play [default: victory]
+              -s, --sound             Sound to play [default: victory]
+                                      Available sounds: ${pkgs.lib.concatStringsSep " " SOUNDS}
               -n, --no-sound          Don't play sound
               --death                 Dark souls death preset
               -h, --help              Print help
@@ -64,8 +68,8 @@
                   DARK_DURATION="$2"
                   shift 2
                   ;;
-                -a|--action)
-                  ACTION="$2"
+                -s|--sound)
+                  SOUND="$2"
                   shift 2
                   ;;
                 -n|--no-sound)
@@ -73,12 +77,17 @@
                   shift
                   ;;
                 --death)
-                  ACTION="death"
+                  SOUND="death"
                   DARK_DURATION=6500
                   DARK_COLOR="#A01212"
                   shift
                   ;;
                 -h|--help)
+                  show_help
+                  exit 0
+                  ;;
+                *)
+                  echo "Unknown option: $1"
                   show_help
                   exit 1
                   ;;
@@ -88,8 +97,7 @@
             export DARK_TEXT DARK_COLOR DARK_DURATION
 
             if [ "$PLAY_SOUND" = true ]; then
-                play_sound "$ACTION"
-                sleep 0.2
+                play_sound "$SOUND"
             fi
 
             exec quickshell -p ${./shell.qml} > /dev/null
