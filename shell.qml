@@ -39,7 +39,7 @@ ShellRoot {
                     text: "NixOS Rebuilt"
                     font.pixelSize: 200
                     color: "#fad049"
-                    font.family: "Times New Roman"
+                    font.family: "EB Garamond"
 
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.verticalCenter: parent.verticalCenter

@@ -5,6 +5,7 @@
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
       lib = pkgs.lib;
+      FONTCONFIG_FILE = pkgs.makeFontsConf { fontDirectories = [ pkgs.eb-garamond ]; };
     in
     {
       packages.${system} = rec {
@@ -18,6 +19,8 @@
             "pipefail"
           ];
           text = ''
+            export FONTCONFIG_FILE=${FONTCONFIG_FILE}
+
             : "''${DARK_TEXT:=Victory!}"
             : "''${DARK_COLOR:=#fad049}"
             : "''${DARK_DURATION:=1000}"
@@ -33,6 +36,7 @@
               -h, --help              Print help
             EOF
             }
+
 
             while [[ $# -gt 0 ]]; do
               case "$1" in
@@ -125,6 +129,10 @@
           quickshell
           sox
         ];
+
+        shellHook = ''
+          export FONTCONFIG_FILE=${FONTCONFIG_FILE}
+        '';
       };
     };
 }
