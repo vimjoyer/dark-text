@@ -4,10 +4,11 @@
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
+      lib = pkgs.lib;
     in
     {
       packages.${system} = rec {
-        dark-shell = pkgs.writeShellApplication {
+        dark-text = pkgs.writeShellApplication {
           name = "dark-shell";
           runtimeInputs = with pkgs; [
             quickshell
@@ -68,7 +69,7 @@
             case "''${1:-}" in
                 -d|--death)
                     ACTION="death"
-                    DURATION=6000
+                    DURATION=6500
                     COLOR="#A01212"
                     shift
                     ;;
@@ -85,17 +86,17 @@
 
             if [ "$PLAY_SOUND" = true ]; then
                 play "${./.}/$ACTION.mp3" >/dev/null 2>&1 &
-                sleep 0.5
+                sleep 0.2
             fi
 
-            ${dark-shell}/bin/dark-shell -t "$DARK_TEXT" -d $DURATION -c $COLOR
+            ${lib.getExe dark-text} -t "$DARK_TEXT" -d $DURATION -c $COLOR
           '';
         };
 
         default = pkgs.symlinkJoin {
           name = "dark-souls";
           paths = [
-            dark-shell
+            dark-text
             dark-souls
           ];
         };
