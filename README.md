@@ -9,18 +9,18 @@ nix run github:vimjoyer/dark-text -- -t "YOUR TEXT"
 add -d flag to show death text and play death sound
 
 ```bash
-nix run github:vimjoyer/dark-text -- -d -t "YOUR TEXT"
+nix run github:vimjoyer/dark-text -- --death -t "YOUR TEXT"
 ```
 
 to disable sound use -n flag
 
 ```bash
-nix run github:vimjoyer/dark-text -- -n -t "YOUR TEXT"
+nix run github:vimjoyer/dark-text -- --death -t "YOUR TEXT"
 ```
 
 To set your own parameters use
 ```bash
-nix run github:vimjoyer/dark-text#dark-text -- -t "YOUR TEXT" --color "#ffffff" --duration 2000
+nix run github:vimjoyer/dark-text -- -t "YOUR TEXT" --color "#ffffff" --duration 2000
 ```
 
 Thanks [Raf](https://github.com/NotAShelf/) for the idea

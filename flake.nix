@@ -4,7 +4,6 @@
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
-      lib = pkgs.lib;
       FONTCONFIG_FILE = pkgs.makeFontsConf { fontDirectories = [ pkgs.eb-garamond ]; };
     in
     {
@@ -13,6 +12,7 @@
           name = "dark-text";
           runtimeInputs = with pkgs; [
             quickshell
+            sox
           ];
           bashOptions = [
             "errexit"
@@ -21,10 +21,13 @@
           text = ''
             export FONTCONFIG_FILE=${FONTCONFIG_FILE}
 
-            : "''${DARK_TEXT:=Victory!}"
+            : "''${DARK_TEXT:=Hello, World!}"
             : "''${DARK_COLOR:=#fad049}"
-            : "''${DARK_DURATION:=1000}"
+            : "''${DARK_DURATION:=10000}"
+            : "''${ACTION:=victory}"
+            : "''${PLAY_SOUND:=true}"
 
+            # todo: add more sounds and docs for them
             show_help() {
             cat <<EOF
             Usage: dark-text [OPTIONS]
@@ -33,10 +36,12 @@
               -t, --text <TEXT>       Text to display [default: Hello, World!]
               -c, --color <COLOR>     Text color [default: #fad049]
               -d, --duration <MS>     Duration in milliseconds [default: 1000]
+              -a, --action            Sound to play [default: victory]
+              -n, --no-sound          Don't play sound
+              --death                 Dark souls death preset
               -h, --help              Print help
             EOF
             }
-
 
             while [[ $# -gt 0 ]]; do
               case "$1" in
@@ -52,6 +57,20 @@
                   DARK_DURATION="$2"
                   shift 2
                   ;;
+                -a|--action)
+                  ACTION="$2"
+                  shift 2
+                  ;;
+                -n|--no-sound)
+                  PLAY_SOUND=false
+                  shift
+                  ;;
+                --death)
+                  ACTION="death"
+                  DARK_DURATION=6500
+                  DARK_COLOR="#A01212"
+                  shift
+                  ;;
                 -h|--help)
                   show_help
                   exit 1
@@ -61,63 +80,16 @@
 
             export DARK_TEXT DARK_COLOR DARK_DURATION
 
-            exec quickshell -p ${./shell.qml} > /dev/null
-          '';
-        };
-
-        dark-souls = pkgs.writeShellApplication {
-          name = "dark-souls";
-          runtimeInputs = with pkgs; [
-            quickshell
-            sox
-          ];
-
-          bashOptions = [
-            "errexit"
-            "pipefail"
-          ];
-
-          text = ''
-            : "''${DARK_TEXT:=Victory!}"
-            : "''${DARK_COLOR:=#fad049}"
-            : "''${DARK_DURATION:=10000}"
-            : "''${ACTION:=victory}"
-            : "''${PLAY_SOUND:=true}"
-
-            case "''${1:-}" in
-                -d|--death)
-                    ACTION="death"
-                    DARK_DURATION=6500
-                    DARK_COLOR="#A01212"
-                    shift
-                    ;;
-            esac
-
-            case "''${1:-}" in
-                -n|--no-sound)
-                    PLAY_SOUND=false
-                    shift
-                    ;;
-            esac
-
-            export DARK_TEXT DARK_COLOR DARK_DURATION
-
             if [ "$PLAY_SOUND" = true ]; then
                 play "${./.}/$ACTION.mp3" >/dev/null 2>&1 &
                 sleep 0.2
             fi
 
-            ${lib.getExe dark-text} "$@"
+            exec quickshell -p ${./shell.qml} > /dev/null
           '';
         };
 
-        default = pkgs.symlinkJoin {
-          name = "dark-souls";
-          paths = [
-            dark-text
-            dark-souls
-          ];
-        };
+        default = dark-text;
 
       };
 
