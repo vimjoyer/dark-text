@@ -9,7 +9,7 @@
     {
       packages.${system} = rec {
         dark-text = pkgs.writeShellApplication {
-          name = "dark-shell";
+          name = "dark-text";
           runtimeInputs = with pkgs; [
             quickshell
           ];
