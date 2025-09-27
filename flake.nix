@@ -27,15 +27,22 @@
             : "''${ACTION:=victory}"
             : "''${PLAY_SOUND:=true}"
 
+            play_sound() {
+                play "${./.}/$1.mp3" >/dev/null 2>&1 &
+            }
+
             # todo: add more sounds and docs for them
             show_help() {
+            if $PLAY_SOUND; then 
+              play_sound "help_me"
+            fi
             cat <<EOF
             Usage: dark-text [OPTIONS]
 
             Options:
               -t, --text <TEXT>       Text to display [default: Hello, World!]
               -c, --color <COLOR>     Text color [default: #fad049]
-              -d, --duration <MS>     Duration in milliseconds [default: 1000]
+              -d, --duration <MS>     Duration in milliseconds [default: 10000]
               -a, --action            Sound to play [default: victory]
               -n, --no-sound          Don't play sound
               --death                 Dark souls death preset
@@ -81,7 +88,7 @@
             export DARK_TEXT DARK_COLOR DARK_DURATION
 
             if [ "$PLAY_SOUND" = true ]; then
-                play "${./.}/$ACTION.mp3" >/dev/null 2>&1 &
+                play_sound "$ACTION"
                 sleep 0.2
             fi
 
