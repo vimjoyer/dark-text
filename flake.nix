@@ -24,6 +24,8 @@
           text = ''
             export FONTCONFIG_FILE=${FONTCONFIG_FILE}
 
+            SOUNDS=(${builtins.concatStringsSep " " (map (s: "\"" + s + "\"") SOUNDS)})
+
             : "''${DARK_TEXT:=Hello, World!}"
             : "''${DARK_COLOR:=#fad049}"
             : "''${DARK_DURATION:=10000}"
@@ -33,6 +35,17 @@
 
             play_sound() {
                 play "${./sounds}/$1.mp3" >/dev/null 2>&1 &
+            }
+
+            contains() {
+              local item=$1
+              shift
+              for x in "$@"; do
+                if [[ "$x" == "$item" ]]; then
+                  return 0
+                fi
+              done
+              return 1
             }
 
             # todo: add more sounds and docs for them
@@ -71,7 +84,12 @@
                   shift 2
                   ;;
                 -s|--sound)
-                  SOUND="$2"
+                  if contains "$2" "''${SOUNDS[@]}"; then
+                    SOUND="$2"
+                  else
+                    echo "Unknown sound. Available sounds: ''${SOUNDS[*]}"
+                    exit 1
+                  fi
                   shift 2
                   ;;
                 -n|--no-sound)
