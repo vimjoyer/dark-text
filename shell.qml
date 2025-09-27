@@ -59,34 +59,42 @@ ShellRoot {
                     panelAnimation.start();
                 }
 
-                SequentialAnimation {
+                ParallelAnimation {
                     id: panelAnimation
 
-                    ParallelAnimation {
+                    SequentialAnimation {
 
                         NumberAnimation {
                             target: myRectangle
                             property: "opacity"
                             from: 0
                             to: 1
+                            duration: 500
+                        }
+
+                        NumberAnimation {
+                            target: myRectangle
+                            property: "opacity"
+                            from: 1
+                            to: 1
                             duration: 1000
                         }
 
                         NumberAnimation {
-                            target: shadowText
-                            property: "font.letterSpacing"
+                            target: myRectangle
+                            property: "opacity"
                             from: 1
-                            to: 3
-                            duration: 2000
+                            to: 0
+                            duration: 500
                         }
                     }
 
                     NumberAnimation {
-                        target: myRectangle
-                        property: "opacity"
+                        target: shadowText
+                        property: "font.letterSpacing"
                         from: 1
-                        to: 0
-                        duration: 1000
+                        to: 10
+                        duration: 2000
                     }
 
                     onStopped: {
