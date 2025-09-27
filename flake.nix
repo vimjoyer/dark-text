@@ -28,7 +28,7 @@
             : "''${PLAY_SOUND:=true}"
 
             play_sound() {
-                play "${./.}/$1.mp3" >/dev/null 2>&1 &
+                play "${./sounds}/$1.mp3" >/dev/null 2>&1 &
             }
 
             # todo: add more sounds and docs for them
