@@ -18,4 +18,9 @@ to disable sound use -n flag
 nix run github:vimjoyer/dark-text -- -n "YOUR TEXT"
 ```
 
+To set your own parameters use
+```bash
+nix run github:vimjoyer/dark-text#dark-text -- -t "YOUR TEXT" --color "#ffffff" --duration 2000
+```
+
 Thanks [Raf](https://github.com/NotAShelf/) for the idea
