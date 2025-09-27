@@ -88,6 +88,10 @@ ShellRoot {
                         to: 0
                         duration: 1000
                     }
+
+                    onStopped: {
+                        Qt.quit();
+                    }
                 }
             }
         }
