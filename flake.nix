@@ -1,34 +1,36 @@
 {
-  outputs =
-    { nixpkgs, ... }:
+  outputs = { nixpkgs, ... }:
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
-      FONTCONFIG_FILE = pkgs.makeFontsConf { fontDirectories = [ pkgs.eb-garamond ]; };
-      SOUNDS = map (f: pkgs.lib.strings.removeSuffix ".mp3" f) (
-        builtins.attrNames (builtins.readDir ./sounds)
-      );
-      OVERLAYS = map (f: pkgs.lib.strings.removeSuffix ".qml" f) (
-        builtins.attrNames (builtins.readDir ./shells)
-      );
-    in
-    {
+      FONTCONFIG_FILE =
+        pkgs.makeFontsConf { fontDirectories = [ pkgs.eb-garamond ]; };
+      TEXT_SHADER = pkgs.runCommand "shader.qsb" { }
+        "${pkgs.lib.getExe pkgs.kdePackages.qtshadertools} --qt6 -o $out ${
+          ./shaders/rays.frag
+        }";
+      SOUNDS = map (f: pkgs.lib.strings.removeSuffix ".mp3" f)
+        (builtins.attrNames (builtins.readDir ./sounds));
+      OVERLAYS = map (f: pkgs.lib.strings.removeSuffix ".qml" f)
+        (builtins.attrNames (builtins.readDir ./shells));
+
+    in {
       packages.${system} = rec {
         dark-text = pkgs.writeShellApplication {
           name = "dark-text";
-          runtimeInputs = with pkgs; [
-            quickshell
-            sox
-          ];
-          bashOptions = [
-            "errexit"
-            "pipefail"
-          ];
+          runtimeInputs = with pkgs; [ quickshell sox ];
+          bashOptions = [ "errexit" "pipefail" ];
           text = ''
             export FONTCONFIG_FILE=${FONTCONFIG_FILE}
+            export TEXT_SHADER=${TEXT_SHADER}
 
-            SOUNDS=(${builtins.concatStringsSep " " (map (s: "\"" + s + "\"") SOUNDS)})
-            OVERLAYS=(${builtins.concatStringsSep " " (map (s: "\"" + s + "\"") OVERLAYS)})
+            SOUNDS=(${
+              builtins.concatStringsSep " " (map (s: ''"'' + s + ''"'') SOUNDS)
+            })
+            OVERLAYS=(${
+              builtins.concatStringsSep " "
+              (map (s: ''"'' + s + ''"'') OVERLAYS)
+            })
 
             : "''${DARK_TEXT:=Hello, World!}"
             : "''${DARK_COLOR:-}"
@@ -70,9 +72,13 @@
               -c, --color <COLOR>     Text color [default: #fad049]
               -d, --duration <MS>     Duration in milliseconds [default: 10000]
               -s, --sound             Sound to play [default: victory]
-                                      Available sounds: ${pkgs.lib.concatStringsSep " " SOUNDS}
+                                      Available sounds: ${
+                                        pkgs.lib.concatStringsSep " " SOUNDS
+                                      }
               -o, --overlay           Overlay to display [default: victory]
-                                      Available overlays: ${pkgs.lib.concatStringsSep " " OVERLAYS}
+                                      Available overlays: ${
+                                        pkgs.lib.concatStringsSep " " OVERLAYS
+                                      }
               -n, --no-sound          Don't play sound
               --no-display            Don't display overlay
               --death                 Dark souls death preset
@@ -165,10 +171,7 @@
         DARK_TEXT = "Hello World";
         DARK_DURATION = 1000;
 
-        buildInputs = with pkgs; [
-          quickshell
-          sox
-        ];
+        buildInputs = with pkgs; [ quickshell sox ];
 
         shellHook = ''
           export FONTCONFIG_FILE=${FONTCONFIG_FILE}
